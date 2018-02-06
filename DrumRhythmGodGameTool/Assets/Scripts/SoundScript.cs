@@ -184,8 +184,8 @@ public class SoundScript : MonoBehaviour {
 
     void CurrentTimePrint()
     {
-        double time = Math.Round(Convert.ToDouble(audioFile.time), 1);
-        double length = Math.Round(Convert.ToDouble(audioFile.clip.length), 1);
+        double time = Math.Round(Convert.ToDouble(audioFile.time), demicalPoint);
+        double length = Math.Round(Convert.ToDouble(audioFile.clip.length), demicalPoint);
         currentTime.text = time + " / " + length;
     }
 
@@ -392,7 +392,7 @@ public class SoundScript : MonoBehaviour {
         }
         notesList.Insert(index, listNote);
         notesList[index].GetComponent<RectTransform>().position += (new Vector3(0, -ButtonListInterval * index));
-        notesList[index].GetComponentInChildren<Text>().text = Math.Round(noteDatas[index].time, 2) + " / " + noteDatas[index].name;
+        notesList[index].GetComponentInChildren<Text>().text = Math.Round(noteDatas[index].time, demicalPoint) + " / " + noteDatas[index].name;
         notesList[index].GetComponent<NoteList>().index = index;
         notesList[index].GetComponent<NoteList>().isCreate = true;
         undoDatas.Push(noteDatas[index]);//
