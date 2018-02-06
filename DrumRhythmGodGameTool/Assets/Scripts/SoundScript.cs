@@ -212,10 +212,11 @@ public class SoundScript : MonoBehaviour {
                 if(Math.Round(time,2) >= Math.Round(noteDatas[i].time,2))
                 {
                     buttonIndex = i;
-                    break;
                 }
                 else
                 {
+                    buttonIndex = i;
+                    break;
                 }
             }
             audioFile.Play();
