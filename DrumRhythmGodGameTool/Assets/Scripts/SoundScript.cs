@@ -256,8 +256,25 @@ public class SoundScript : MonoBehaviour {
         beatTime = Math.Round(beatTime, 0);
         beatTime *= minTime;
         beatTime = Math.Round(beatTime, 1);
-
         notedata.time = (float)beatTime;
+
+        int num = 0;
+        for(int i =0; i<noteDatas.Count; i++)
+        {
+            if(noteDatas[i].time == notedata.time)
+            {
+                num++;
+                if (noteDatas[i].name == notedata.name)
+                {
+                    return;
+                }
+            }
+
+            if(num>2)
+            {
+                return;
+            }
+        }
 
         if (noteDatas.Count > 0)
         {
