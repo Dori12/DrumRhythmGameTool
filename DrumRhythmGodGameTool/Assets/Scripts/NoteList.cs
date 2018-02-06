@@ -28,6 +28,10 @@ public class NoteList : MonoBehaviour {
             soundSc.RemoveNoteList(index);
             Destroy(gameObject);
         }
+        else
+        {
+            soundSc.MoveTime(index);
+        }
     }
 
     public void UndoRemoveNote()

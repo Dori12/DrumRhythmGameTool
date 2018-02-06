@@ -10,7 +10,7 @@ using UnityEngine.EventSystems;
 public class NoteData
 {
     public string name;
-    public float time;
+    public double time;
 }
 
 public class SoundScript : MonoBehaviour {
@@ -158,6 +158,7 @@ public class SoundScript : MonoBehaviour {
                 }
                 audioRemainTime.value = audioFile.time;
                 audioTimeInputField.text = audioFile.time.ToString();
+                ButtonInit();
             }
             if (Input.GetKeyDown(KeyCode.RightArrow))
             {
@@ -171,6 +172,7 @@ public class SoundScript : MonoBehaviour {
                 }
                 audioRemainTime.value = audioFile.time;
                 audioTimeInputField.text = audioFile.time.ToString();
+                ButtonInit();
             }
         }
 
@@ -182,7 +184,7 @@ public class SoundScript : MonoBehaviour {
             }
             if(Input.GetKeyDown(KeyCode.X))
             {
-                //Redo();
+                OnPlayPauseButton();
             }
         }
     }
@@ -208,7 +210,8 @@ public class SoundScript : MonoBehaviour {
     {
         if (audioFile.isPlaying)
         {
-            audioTimeInputField.text = audioFile.time.ToString();
+            double time = Math.Round(audioFile.time, demicalPoint);
+            audioTimeInputField.text = time.ToString();
         }
         else
         {
@@ -242,48 +245,68 @@ public class SoundScript : MonoBehaviour {
         }
     }
 
-    public void OnPlayButton()
+    public void OnPlayPauseButton()
+    {
+        if(audioFile.isPlaying)
+        {
+            OnStopButton();
+            GameObject.Find("Play").GetComponentInChildren<Text>().text = "Play";
+        }
+        else
+        {
+            OnPlayButton();
+            GameObject.Find("Play").GetComponentInChildren<Text>().text = "Stop";
+        }
+    }
+
+    private void OnPlayButton()
     {
         if (!audioFile.isPlaying)
         {
             PlayIndexInit();
-            float time = audioFile.time;
-            for(int i=0; i<noteDatas.Count; i++)
-            {
-                if(Math.Round(time,2) >= Math.Round(noteDatas[i].time,2))
-                {
-                    buttonIndex = i;
-                }
-                else
-                {
-                    buttonIndex = i;
-                    break;
-                }
-            }
-
-            for (int i = 0; i < notesList.Count; i++)
-            {
-                if (buttonIndex > i)
-                {
-                    notesList[i].GetComponent<Image>().color = new Color(255, 0, 0, 255);
-                }
-                else
-                {
-                    notesList[i].GetComponent<Image>().color = new Color(255, 255, 255, 255);
-                }
-            }
-
+            ButtonInit();
             audioFile.Play();
         }
     }
 
-    public void OnStopButton()
+    private void OnStopButton()
     {
         if (audioFile.isPlaying)
         {
             audioFile.Pause();
         }
     }
+
+    public void ButtonInit()
+    {
+        float time = audioFile.time;
+        for (int i = 0; i < noteDatas.Count; i++)
+        {
+            if (Math.Round(time, 2) >= Math.Round(noteDatas[i].time, 2))
+            {
+                buttonIndex = i;
+            }
+            else
+            {
+                buttonIndex = i;
+                break;
+            }
+        }
+
+        for (int i = 0; i < notesList.Count; i++)
+        {
+            if (buttonIndex > i)
+            {
+                notesList[i].GetComponent<Image>().color = new Color(255, 0, 0, 255);
+            }
+            else
+            {
+                notesList[i].GetComponent<Image>().color = new Color(255, 255, 255, 255);
+            }
+        }
+    }
+
+    
 
     public void AudioTimeSet(float time)
     {
@@ -295,7 +318,7 @@ public class SoundScript : MonoBehaviour {
         AddNoteData(name, audioFile.time);
     }
 
-    void AddNoteData(string _name, float _time)
+    void AddNoteData(string _name, double _time)
     {
         NoteData notedata = new NoteData
         {
@@ -307,7 +330,7 @@ public class SoundScript : MonoBehaviour {
         beatTime = Math.Round(beatTime, 0);
         beatTime *= minTime;
         beatTime = Math.Round(beatTime, demicalPoint);
-        notedata.time = (float)beatTime;
+        notedata.time = beatTime;
 
         int num = 0;
         for(int i =0; i<noteDatas.Count; i++)
@@ -450,14 +473,16 @@ public class SoundScript : MonoBehaviour {
     {
         if (isRemove)
         {
+            isRemove = false;
             GameObject.Find("Remove").GetComponentInChildren<Text>().text = "Remove OFF";
+            GameObject.Find("Remove").GetComponent<Image>().color = new Color(0, 255, 0, 255);
         }
         else
         {
+            isRemove = true;
             GameObject.Find("Remove").GetComponentInChildren<Text>().text = "Remove ON";
+            GameObject.Find("Remove").GetComponent<Image>().color = new Color(255, 0, 0, 255);
         }
-
-        isRemove = !isRemove;
     }
 
     public float GetAudioTime()
@@ -516,7 +541,7 @@ public class SoundScript : MonoBehaviour {
         }
     }
 
-    void UndoAddNoteData(string _name, float _time)
+    void UndoAddNoteData(string _name, double _time)
     {
         NoteData notedata = new NoteData
         {
@@ -528,7 +553,7 @@ public class SoundScript : MonoBehaviour {
         beatTime = Math.Round(beatTime, 0);
         beatTime *= minTime;
         beatTime = Math.Round(beatTime, demicalPoint);
-        notedata.time = (float)beatTime;
+        notedata.time = beatTime;
 
         int num = 0;
         for (int i = 0; i < noteDatas.Count; i++)
@@ -652,5 +677,13 @@ public class SoundScript : MonoBehaviour {
     {
         //redoDataList.Clear();
         //redoDatas.Clear();
+    }
+
+    public void MoveTime(int index)
+    {
+        audioFile.time = (float)noteDatas[index].time;
+        audioRemainTime.value = audioFile.time;
+        audioTimeInputField.text = audioFile.time.ToString();
+        ButtonInit();
     }
 }
