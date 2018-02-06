@@ -394,7 +394,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a8f2c528feae194ab7c9b31956da461, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  thisName: 
+  thisName: HighTom
 --- !u!1 &56755084
 GameObject:
   m_ObjectHideFlags: 0
@@ -425,7 +425,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 0, y: 300}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 183, y: 300}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &111164353
@@ -1790,7 +1790,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a8f2c528feae194ab7c9b31956da461, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  thisName: 
+  thisName: Base
 --- !u!1 &642820485
 GameObject:
   m_ObjectHideFlags: 0
@@ -1925,7 +1925,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a8f2c528feae194ab7c9b31956da461, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  thisName: 
+  thisName: Snare
 --- !u!1 &678188125
 GameObject:
   m_ObjectHideFlags: 0
@@ -2693,7 +2693,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a8f2c528feae194ab7c9b31956da461, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  thisName: 
+  thisName: HighHat
 --- !u!1 &903913714
 GameObject:
   m_ObjectHideFlags: 0
@@ -4057,7 +4057,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a8f2c528feae194ab7c9b31956da461, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  thisName: 
+  thisName: LowTom
 --- !u!1 &1349302865
 GameObject:
   m_ObjectHideFlags: 0
@@ -4334,7 +4334,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a8f2c528feae194ab7c9b31956da461, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  thisName: 
+  thisName: Cymbal
 --- !u!1 &1443312088
 GameObject:
   m_ObjectHideFlags: 0
@@ -5323,7 +5323,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Symbol
+  m_Text: Cymbal
 --- !u!222 &1941821724
 CanvasRenderer:
   m_ObjectHideFlags: 0
