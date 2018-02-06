@@ -31,11 +31,17 @@ public class SoundScript : MonoBehaviour {
     private Text currentTime;
     private Slider audioRemainTime;
     private InputField audioPitch;
+    private InputField audioTimeInputField;
 
     private float pitch;
+    private bool valueChange;
 
-    private PriorityQueue<NoteData> noteDatas;
-    
+    //private PriorityQueue<NoteData> noteDatas;
+    private List<NoteData> noteDatas;
+    private List<GameObject> notesList;
+    private Stack<NoteData> undoDatas;
+    private Stack<GameObject> undoDataList;
+    public bool isRemove;
 
     // Use this for initialization
     void Start () {
@@ -43,9 +49,14 @@ public class SoundScript : MonoBehaviour {
         audioName = GameObject.Find("AudioFileNameText").GetComponent<Text>();
         audioRemainTime = GetComponentInChildren<Slider>();
         currentTime = GameObject.Find("CurrentTimeText").GetComponent<Text>();
-        audioPitch = GetComponentInChildren<InputField>();
+        audioPitch = GameObject.Find("PitchInputField").GetComponent<InputField>();
+        audioTimeInputField = GameObject.Find("TimeInputField").GetComponent<InputField>();
         pitch = 0.0f;
-        noteDatas = new PriorityQueue<NoteData>();
+        noteDatas = new List<NoteData>();
+        notesList = new List<GameObject>();
+        isRemove = false;
+        undoDatas = new Stack<NoteData>();
+        undoDataList = new Stack<GameObject>();
 
         audioName.text = audioFile.clip.name;
         currentTime.text = audioFile.time.ToString();
@@ -59,11 +70,14 @@ public class SoundScript : MonoBehaviour {
         CurrentTimePrint();
         PitchControl();
         SliderControl();
+        TimeInputFieldUpdate();
     }
 
     void CurrentTimePrint()
     {
-        currentTime.text = audioFile.time + " / " + audioFile.clip.length;
+        double time = Math.Round(Convert.ToDouble(audioFile.time), 1);
+        double length = Math.Round(Convert.ToDouble(audioFile.clip.length), 1);
+        currentTime.text = time + " / " + length;
     }
 
     void PitchControl()
@@ -74,6 +88,32 @@ public class SoundScript : MonoBehaviour {
             pitch = 0.0f;
         }
         audioFile.pitch = pitch;
+    }
+
+    void TimeInputFieldUpdate()
+    {
+        if (audioFile.isPlaying)
+        {
+            audioTimeInputField.text = audioFile.time.ToString();
+        }
+        else
+        {
+
+        }
+    }
+
+    public void ChangeTimeInputField()
+    {
+        float time;
+        bool parsed = float.TryParse(audioTimeInputField.text, out time);
+
+        if(!parsed)
+        {
+            time = 0.0f;
+        }
+
+        audioFile.time = time;
+        audioRemainTime.value = time;
     }
 
     void SliderControl()
@@ -90,12 +130,18 @@ public class SoundScript : MonoBehaviour {
 
     public void OnPlayButton()
     {
-        audioFile.Play();
+        if (!audioFile.isPlaying)
+        {
+            audioFile.Play();
+        }
     }
 
     public void OnStopButton()
     {
-        audioFile.Pause();
+        if (audioFile.isPlaying)
+        {
+            audioFile.Pause();
+        }
     }
 
     public void AudioTimeSet(float time)
@@ -103,34 +149,157 @@ public class SoundScript : MonoBehaviour {
         audioFile.time = time;
     }
 
-    public void ClickNote(string noteName)
+    public void ClickNote(string name)
+    {
+        AddNoteData(name, audioFile.time);
+        //NoteData notedata = new NoteData
+        //{
+        //    name = noteName,
+        //    time = audioFile.time
+        //};
+
+        //if (noteDatas.Count > 0)
+        //{
+        //    bool largest = true;
+        //    for (int i = 0; i < noteDatas.Count; i++)
+        //    {
+        //        if (notedata.time <= noteDatas[i].time)
+        //        {
+        //            noteDatas.Insert(i, notedata);
+        //            largest = false;
+        //            AddNoteList(i);
+        //            break;
+        //        }
+        //    }
+
+        //    if(largest)
+        //    {
+        //        noteDatas.Add(notedata);
+        //        AddNoteList(noteDatas.Count-1);
+        //    }
+        //}
+        //else
+        //{
+        //    noteDatas.Add(notedata);
+        //    AddNoteList(0);
+        //}
+    }
+
+    void AddNoteData(string name, float time)
     {
         NoteData notedata = new NoteData
         {
-            name = noteName,
-            time = audioFile.time
+            name = name,
+            time = time
         };
 
-        noteDatas.Add(notedata);
+        if (noteDatas.Count > 0)
+        {
+            bool largest = true;
+            for (int i = 0; i < noteDatas.Count; i++)
+            {
+                if (notedata.time <= noteDatas[i].time)
+                {
+                    noteDatas.Insert(i, notedata);
+                    largest = false;
+                    AddNoteList(i);
+                    break;
+                }
+            }
+
+            if (largest)
+            {
+                noteDatas.Add(notedata);
+                AddNoteList(noteDatas.Count - 1);
+            }
+        }
+        else
+        {
+            noteDatas.Add(notedata);
+            AddNoteList(0);
+        }
     }
 
     public void Save()
     {
-        string toJson = JsonHelper.ToJson<NoteData>(noteDatas.GetItemList().ToArray(), prettyPrint: true);
-        File.WriteAllText(Application.dataPath + "/Saves/data.json", toJson);
+        string toJson = JsonHelper.ToJson<NoteData>(noteDatas.ToArray(), prettyPrint: true);
+        DirectoryInfo dir = Directory.CreateDirectory(Application.dataPath + "/JsonFile");
+        //Directory.CreateDirectory(Application.persistentDataPath + "/JsonFile");
+        File.WriteAllText(Application.dataPath + "/JsonFile/data.json", toJson);
+        //File.WriteAllText(Application.persistentDataPath + "JsonFile/data.json", toJson);
     }
 
     public void Load()
     {
-        string jsonString = File.ReadAllText(Application.dataPath + "/Saves/data.json");
+        string jsonString = File.ReadAllText(Application.dataPath+ "/JsonFile/data.json");
         NoteData[] data = JsonHelper.FromJson<NoteData>(jsonString);
         noteDatas.Clear();
-        for(int i=0; i<data.Length; i++)
+        notesList.Clear();
+        Button[] childs = GameObject.Find("Content").transform.GetComponentsInChildren<Button>();
+
+        foreach(Button child in childs)
+        {
+            Destroy(child.gameObject);
+        }
+
+        for (int i=0; i<data.Length; i++)
         {
             noteDatas.Add(data[i]);
-            GameObject listNote = Instantiate(ListNote, GameObject.Find("Content").GetComponent<Transform>(), false);
-            listNote.GetComponent<Transform>().Translate(new Vector3(0, -30 * i));
-            listNote.GetComponentInChildren<Text>().text = noteDatas.GetItemList()[i].time + " / " + noteDatas.GetItemList()[i].name;
+            AddNoteList(i);
         }
+    }
+
+    void AddNoteList(int index)
+    {
+        GameObject listNote = Instantiate(ListNote, GameObject.Find("Content").GetComponent<Transform>(), false);
+        for (int i=index; i< notesList.Count; i++)
+        {
+            notesList[i].transform.Translate(new Vector3(0, -32));
+            notesList[i].GetComponent<NoteList>().index = i+1;
+        }
+        notesList.Insert(index, listNote);
+        notesList[index].transform.Translate(new Vector3(0, -32 * index));
+        notesList[index].GetComponentInChildren<Text>().text = Math.Round(noteDatas[index].time, 2) + " / " + noteDatas[index].name;
+        notesList[index].GetComponent<NoteList>().index = index;
+        notesList[index].GetComponent<NoteList>().isCreate = true;
+        undoDatas.Push(noteDatas[index]);//
+        undoDataList.Push(notesList[index]);//
+    }
+
+    public void RemoveNoteList(int index)
+    {
+        notesList[index].GetComponent<NoteList>().isCreate = false;
+        undoDatas.Push(noteDatas[index]);//
+        undoDataList.Push(notesList[index]);//
+        notesList.RemoveAt(index);
+        for(int i=index; i < notesList.Count; i++)
+        {
+            notesList[i].transform.Translate(new Vector3(0, +32));
+            notesList[i].GetComponent<NoteList>().index = i;
+        }
+    }
+
+    public void ToggleRemoveMode()
+    {
+        if (isRemove)
+        {
+            GameObject.Find("Remove").GetComponentInChildren<Text>().text = "Remove OFF";
+        }
+        else
+        {
+            GameObject.Find("Remove").GetComponentInChildren<Text>().text = "Remove ON";
+        }
+
+        isRemove = !isRemove;
+    }
+
+    public float GetAudioTime()
+    {
+        return audioFile.time;
+    }
+
+    public List<NoteData> GetNoteData()
+    {
+        return noteDatas;
     }
 }

@@ -39,6 +39,7 @@ GameObject:
   - component: {fileID: 222433813973484890}
   - component: {fileID: 114113959084698542}
   - component: {fileID: 114424895631863896}
+  - component: {fileID: 114929523180266450}
   m_Layer: 5
   m_Name: NoteListButton
   m_TagString: Untagged
@@ -111,7 +112,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 114113959084698542}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 114929523180266450}
+        m_MethodName: RemoveNote
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &114602295522552412
@@ -147,6 +159,18 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: Button
+--- !u!114 &114929523180266450
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1170843576531924}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c5e2e25859c959445acb4e92a91ddb09, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  index: 0
 --- !u!222 &222397649577794178
 CanvasRenderer:
   m_ObjectHideFlags: 1
