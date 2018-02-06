@@ -369,11 +369,11 @@ public class SoundScript : MonoBehaviour {
         GameObject listNote = Instantiate(ListNote, GameObject.Find("Content").GetComponent<Transform>(), false);
         for (int i=index; i< notesList.Count; i++)
         {
-            notesList[i].transform.Translate(new Vector3(0, -32));
+            notesList[i].GetComponent<RectTransform>().position += new Vector3(0, -40);
             notesList[i].GetComponent<NoteList>().index = i+1;
         }
         notesList.Insert(index, listNote);
-        notesList[index].transform.Translate(new Vector3(0, -32 * index));
+        notesList[index].GetComponent<RectTransform>().position += (new Vector3(0, -40 * index));
         notesList[index].GetComponentInChildren<Text>().text = Math.Round(noteDatas[index].time, 2) + " / " + noteDatas[index].name;
         notesList[index].GetComponent<NoteList>().index = index;
         notesList[index].GetComponent<NoteList>().isCreate = true;
@@ -390,7 +390,7 @@ public class SoundScript : MonoBehaviour {
         noteDatas.RemoveAt(index);
         for(int i=index; i < notesList.Count; i++)
         {
-            notesList[i].transform.Translate(new Vector3(0, +32));
+            notesList[i].GetComponent<RectTransform>().position += new Vector3(0, +40);
             notesList[i].GetComponent<NoteList>().index = i;
         }
     }
