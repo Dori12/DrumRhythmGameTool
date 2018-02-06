@@ -6,30 +6,24 @@ using System;
 
 public class ButtonChange : MonoBehaviour {
 
-    private SoundScript soundSc;
+    public string thisName;
 	// Use this for initialization
 	void Start () {
-        soundSc = GameObject.Find("Canvas").GetComponent<SoundScript>();
+
+        thisName = gameObject.GetComponentInChildren<Text>().text;
 	}
 	
 	// Update is called once per frame
 	void Update () {
-        for(int i=0; i<soundSc.GetNoteData().Count; i++)
-        {
-            if(Math.Round(soundSc.GetAudioTime(), 2) == Math.Round(soundSc.GetNoteData()[i].time,2))
-            {
-                if (soundSc.GetNoteData()[i].name == gameObject.GetComponentInChildren<Text>().text)
-                {
-                    ChangeColor();
-                }
-            }
-        }
 	}
 
-    void ChangeColor()
+    public void ChangeColor()
     {
-        gameObject.GetComponent<Image>().color = new Color(255, 0, 0, 255);
-        Invoke("ResetColor", 0.1f);
+        if (thisName == gameObject.GetComponentInChildren<Text>().text)
+        {
+            gameObject.GetComponent<Image>().color = new Color(255, 0, 0, 255);
+            Invoke("ResetColor", 0.1f);
+        }
     }
 
     void ResetColor()

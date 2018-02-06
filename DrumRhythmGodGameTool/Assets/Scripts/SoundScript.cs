@@ -43,7 +43,10 @@ public class SoundScript : MonoBehaviour {
     private List<GameObject> notesList;
     private Stack<NoteData> undoDatas;
     private Stack<GameObject> undoDataList;
+
+    private ButtonChange[] bcSc = new ButtonChange[6];
     public bool isRemove;
+    private int buttonIndex;
 
     // Use this for initialization
     void Start () {
@@ -61,11 +64,20 @@ public class SoundScript : MonoBehaviour {
         undoDataList = new Stack<GameObject>();
         ifFileName = GameObject.Find("FileNameInput").GetComponent<InputField>();
 
+        bcSc[0] = GameObject.Find("HighHat").GetComponent<ButtonChange>();
+        bcSc[1] = GameObject.Find("Snare").GetComponent<ButtonChange>();
+        bcSc[2] = GameObject.Find("Base").GetComponent<ButtonChange>();
+        bcSc[3] = GameObject.Find("HighTom").GetComponent<ButtonChange>();
+        bcSc[4] = GameObject.Find("LowTom").GetComponent<ButtonChange>();
+        bcSc[5] = GameObject.Find("Symbol").GetComponent<ButtonChange>();
+
         audioName.text = audioFile.clip.name;
         currentTime.text = audioFile.time.ToString();
 
         audioRemainTime.maxValue = audioFile.clip.length;
 
+        audioFile.Play();
+        audioFile.Stop();
     }
 	
 	// Update is called once per frame
@@ -75,33 +87,61 @@ public class SoundScript : MonoBehaviour {
         SliderControl();
         TimeInputFieldUpdate();
         KeyUpdate();
+        PlayNoteDataIndex();
+    }
+
+    void PlayNoteDataIndex()
+    {
+        if (!audioFile.isPlaying)
+            return;
+        if (noteDatas.Count < 1)
+            return;
+
+        if (noteDatas.Count > buttonIndex)
+        {
+            if (Math.Round(audioFile.time, 2) >= Math.Round(noteDatas[buttonIndex].time, 2))
+            {
+                for (int i = 0; i < 5; i++)
+                {
+                    if (bcSc[i].thisName == noteDatas[buttonIndex].name)
+                    {
+                        bcSc[i].ChangeColor();
+                        break;
+                    }
+                }
+                buttonIndex++;
+            }
+        }
     }
 
     void KeyUpdate()
     {
-        if(Input.GetKeyDown(KeyCode.A))
+        if (Input.anyKeyDown)
         {
-            ClickNote("HighHat");
-        }
-        if (Input.GetKeyDown(KeyCode.S))
-        {
-            ClickNote("Snare");
-        }
-        if (Input.GetKeyDown(KeyCode.D))
-        {
-            ClickNote("HighTom");
-        }
-        if (Input.GetKeyDown(KeyCode.F))
-        {
-            ClickNote("LowTom");
-        }
-        if (Input.GetKeyDown(KeyCode.G))
-        {
-            ClickNote("Symbol");
-        }
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            ClickNote("Base");
+            if (Input.GetKeyDown(KeyCode.A))
+            {
+                ClickNote("HighHat");
+            }
+            if (Input.GetKeyDown(KeyCode.S))
+            {
+                ClickNote("Snare");
+            }
+            if (Input.GetKeyDown(KeyCode.D))
+            {
+                ClickNote("HighTom");
+            }
+            if (Input.GetKeyDown(KeyCode.F))
+            {
+                ClickNote("LowTom");
+            }
+            if (Input.GetKeyDown(KeyCode.G))
+            {
+                ClickNote("Symbol");
+            }
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                ClickNote("Base");
+            }
         }
     }
 
@@ -157,6 +197,7 @@ public class SoundScript : MonoBehaviour {
         else
         {
             audioRemainTime.value = audioFile.time;
+            
         }
     }
 
@@ -164,7 +205,21 @@ public class SoundScript : MonoBehaviour {
     {
         if (!audioFile.isPlaying)
         {
+            PlayIndexInit();
+            float time = audioFile.time;
+            for(int i=0; i<noteDatas.Count; i++)
+            {
+                if(Math.Round(time,2) >= Math.Round(noteDatas[i].time,2))
+                {
+                }
+                else
+                {
+                    buttonIndex = i;
+                    break;
+                }
+            }
             audioFile.Play();
+            Debug.Log(buttonIndex);
         }
     }
 
@@ -173,6 +228,7 @@ public class SoundScript : MonoBehaviour {
         if (audioFile.isPlaying)
         {
             audioFile.Pause();
+            PlayIndexInit();
         }
     }
 
@@ -184,37 +240,6 @@ public class SoundScript : MonoBehaviour {
     public void ClickNote(string name)
     {
         AddNoteData(name, audioFile.time);
-        //NoteData notedata = new NoteData
-        //{
-        //    name = noteName,
-        //    time = audioFile.time
-        //};
-
-        //if (noteDatas.Count > 0)
-        //{
-        //    bool largest = true;
-        //    for (int i = 0; i < noteDatas.Count; i++)
-        //    {
-        //        if (notedata.time <= noteDatas[i].time)
-        //        {
-        //            noteDatas.Insert(i, notedata);
-        //            largest = false;
-        //            AddNoteList(i);
-        //            break;
-        //        }
-        //    }
-
-        //    if(largest)
-        //    {
-        //        noteDatas.Add(notedata);
-        //        AddNoteList(noteDatas.Count-1);
-        //    }
-        //}
-        //else
-        //{
-        //    noteDatas.Add(notedata);
-        //    AddNoteList(0);
-        //}
     }
 
     void AddNoteData(string name, float time)
@@ -263,6 +288,7 @@ public class SoundScript : MonoBehaviour {
 
     public void Load()
     {
+        PlayIndexInit();
         string jsonString = File.ReadAllText(Application.dataPath+ "/JsonFile/" + fileName + ".json");
         NoteData[] data = JsonHelper.FromJson<NoteData>(jsonString);
         noteDatas.Clear();
@@ -339,5 +365,10 @@ public class SoundScript : MonoBehaviour {
     public void ChangeFileName()
     {
         fileName = ifFileName.text;
+    }
+
+    public void PlayIndexInit()
+    {
+        buttonIndex = 0;
     }
 }
