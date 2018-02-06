@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System;
 
 public class ButtonChange : MonoBehaviour {
 
@@ -15,7 +16,7 @@ public class ButtonChange : MonoBehaviour {
 	void Update () {
         for(int i=0; i<soundSc.GetNoteData().Count; i++)
         {
-            if(soundSc.GetAudioTime() == soundSc.GetNoteData()[i].time)
+            if(Math.Round(soundSc.GetAudioTime(), 2) == Math.Round(soundSc.GetNoteData()[i].time,2))
             {
                 if (soundSc.GetNoteData()[i].name == gameObject.GetComponentInChildren<Text>().text)
                 {
