@@ -222,7 +222,6 @@ public class SoundScript : MonoBehaviour {
                 }
             }
             audioFile.Play();
-            Debug.Log(buttonIndex);
         }
     }
 
