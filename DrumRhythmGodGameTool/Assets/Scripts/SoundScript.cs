@@ -101,7 +101,7 @@ public class SoundScript : MonoBehaviour {
         {
             if (Math.Round(audioFile.time, 2) >= Math.Round(noteDatas[buttonIndex].time, 2))
             {
-                for (int i = 0; i < 5; i++)
+                for (int i = 0; i < 6; i++)
                 {
                     if (bcSc[i].thisName == noteDatas[buttonIndex].name)
                     {
