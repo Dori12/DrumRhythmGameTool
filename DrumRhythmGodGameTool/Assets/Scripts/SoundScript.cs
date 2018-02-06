@@ -70,7 +70,7 @@ public class SoundScript : MonoBehaviour {
         bcSc[2] = GameObject.Find("Base").GetComponent<ButtonChange>();
         bcSc[3] = GameObject.Find("HighTom").GetComponent<ButtonChange>();
         bcSc[4] = GameObject.Find("LowTom").GetComponent<ButtonChange>();
-        bcSc[5] = GameObject.Find("Symbol").GetComponent<ButtonChange>();
+        bcSc[5] = GameObject.Find("Cymbal").GetComponent<ButtonChange>();
 
         audioName.text = audioFile.clip.name;
         currentTime.text = audioFile.time.ToString();
@@ -137,7 +137,7 @@ public class SoundScript : MonoBehaviour {
             }
             if (Input.GetKeyDown(KeyCode.G))
             {
-                ClickNote("Symbol");
+                ClickNote("Cymbal");
             }
             if (Input.GetKeyDown(KeyCode.Space))
             {
