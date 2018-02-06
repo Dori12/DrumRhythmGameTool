@@ -7,19 +7,10 @@ using System.IO;
 using UnityEngine.EventSystems;
 
 [Serializable]
-public class NoteData : IComparable
+public class NoteData
 {
     public string name;
     public float time;
-
-    public int CompareTo(object other)
-    {
-        if ((other is NoteData) == false) {
-            return 0;
-        }
-
-        return time.CompareTo((other as NoteData).time);
-    }
 }
 
 public class SoundScript : MonoBehaviour {
@@ -45,7 +36,9 @@ public class SoundScript : MonoBehaviour {
     private List<NoteData> noteDatas;
     private List<GameObject> notesList;
     private Stack<NoteData> undoDatas;
-    private Stack<GameObject> undoDataList;
+    private Stack<NoteDataList> undoDataList;
+    private Stack<NoteData> redoDatas;
+    private Stack<NoteDataList> redoDataList;
 
     private ButtonChange[] bcSc = new ButtonChange[6];
     public bool isRemove;
@@ -61,12 +54,13 @@ public class SoundScript : MonoBehaviour {
         currentTime = GameObject.Find("CurrentTimeText").GetComponent<Text>();
         audioPitch = GameObject.Find("PitchInputField").GetComponent<InputField>();
         audioTimeInputField = GameObject.Find("TimeInputField").GetComponent<InputField>();
-        pitch = 0.0f;
         noteDatas = new List<NoteData>();
         notesList = new List<GameObject>();
         isRemove = false;
         undoDatas = new Stack<NoteData>();
-        undoDataList = new Stack<GameObject>();
+        undoDataList = new Stack<NoteDataList>();
+        redoDatas = new Stack<NoteData>();
+        redoDataList = new Stack<NoteDataList>();
         ifFileName = GameObject.Find("FileNameInput").GetComponent<InputField>();
         ifJumpInterval = GameObject.Find("JumpIntervalInputField").GetComponent<InputField>();
 
@@ -79,8 +73,8 @@ public class SoundScript : MonoBehaviour {
 
         audioName.text = audioFile.clip.name;
         currentTime.text = audioFile.time.ToString();
-
         audioRemainTime.maxValue = audioFile.clip.length;
+        pitch = 0.0f;
 
         audioFile.Play();
         audioFile.Stop();
@@ -94,7 +88,6 @@ public class SoundScript : MonoBehaviour {
         TimeInputFieldUpdate();
         KeyUpdate();
         PlayNoteDataIndex();
-        
     }
 
     void PlayNoteDataIndex()
@@ -117,7 +110,7 @@ public class SoundScript : MonoBehaviour {
                     }
                 }
                 buttonIndex++;
-                if (notesList.Count > 1)
+                if (notesList.Count > 0)
                 {
                     notesList[buttonIndex - 1].GetComponent<Image>().color = new Color(255, 0, 0, 255);
                 }
@@ -178,6 +171,18 @@ public class SoundScript : MonoBehaviour {
                 }
                 audioRemainTime.value = audioFile.time;
                 audioTimeInputField.text = audioFile.time.ToString();
+            }
+        }
+
+        if(Input.GetKey(KeyCode.LeftControl))
+        {
+            if(Input.GetKeyDown(KeyCode.Z))
+            {
+                Undo();
+            }
+            if(Input.GetKeyDown(KeyCode.X))
+            {
+                //Redo();
             }
         }
     }
@@ -256,7 +261,7 @@ public class SoundScript : MonoBehaviour {
                 }
             }
 
-            for (int i = 0; i < notesList.Count - 1; i++)
+            for (int i = 0; i < notesList.Count; i++)
             {
                 if (buttonIndex > i)
                 {
@@ -335,6 +340,7 @@ public class SoundScript : MonoBehaviour {
                     noteDatas.Insert(i, notedata);
                     largest = false;
                     AddNoteList(i);
+                    RedoStackInit();
                     break;
                 }
             }
@@ -343,19 +349,21 @@ public class SoundScript : MonoBehaviour {
             {
                 noteDatas.Add(notedata);
                 AddNoteList(noteDatas.Count - 1);
+                RedoStackInit();
             }
         }
         else
         {
             noteDatas.Add(notedata);
             AddNoteList(0);
+            RedoStackInit();
         }
     }
 
     public void Save()
     {
         string toJson = JsonHelper.ToJson<NoteData>(noteDatas.ToArray(), prettyPrint: true);
-        DirectoryInfo dir = Directory.CreateDirectory(Application.dataPath + "/JsonFile");
+        Directory.CreateDirectory(Application.dataPath + "/JsonFile");
         //Directory.CreateDirectory(Application.persistentDataPath + "/JsonFile");
         File.WriteAllText(Application.dataPath + "/JsonFile/" + fileName + ".json", toJson);
         //File.WriteAllText(Application.persistentDataPath + "JsonFile/" + fileName" +".json", toJson);
@@ -380,30 +388,53 @@ public class SoundScript : MonoBehaviour {
             noteDatas.Add(data[i]);
             AddNoteList(i);
         }
+
+        UndoStackInit();
     }
 
     void AddNoteList(int index)
     {
         GameObject listNote = Instantiate(ListNote, GameObject.Find("Content").GetComponent<Transform>(), false);
-        for (int i=index; i< notesList.Count; i++)
+        for (int i = index; i < notesList.Count; i++)
         {
             notesList[i].GetComponent<RectTransform>().position += new Vector3(0, -ButtonListInterval);
-            notesList[i].GetComponent<NoteList>().index = i+1;
+            notesList[i].GetComponent<NoteList>().index = i + 1;
         }
         notesList.Insert(index, listNote);
+
         notesList[index].GetComponent<RectTransform>().position += (new Vector3(0, -ButtonListInterval * index));
         notesList[index].GetComponentInChildren<Text>().text = Math.Round(noteDatas[index].time, demicalPoint) + " / " + noteDatas[index].name;
         notesList[index].GetComponent<NoteList>().index = index;
         notesList[index].GetComponent<NoteList>().isCreate = true;
-        undoDatas.Push(noteDatas[index]);//
-        undoDataList.Push(notesList[index]);//
+
+        NoteData notedata = new NoteData();
+        notedata.name = noteDatas[index].name;
+        notedata.time = noteDatas[index].time;
+        
+
+        NoteDataList notelist = new NoteDataList();
+        notelist.index = index;
+        notelist.isCreate = true;
+
+        undoDatas.Push(notedata);
+        undoDataList.Push(notelist);
     }
 
     public void RemoveNoteList(int index)
     {
         notesList[index].GetComponent<NoteList>().isCreate = false;
-        undoDatas.Push(noteDatas[index]);//
-        undoDataList.Push(notesList[index]);//
+
+        NoteData notedata = new NoteData();
+        notedata.name = noteDatas[index].name;
+        notedata.time = noteDatas[index].time;
+
+        NoteDataList notelist = new NoteDataList();
+        notelist.index = index;
+        notelist.isCreate = false;
+
+        undoDatas.Push(notedata);//
+        undoDataList.Push(notelist);//
+
         notesList.RemoveAt(index);
         noteDatas.RemoveAt(index);
         for(int i=index; i < notesList.Count; i++)
@@ -411,6 +442,8 @@ public class SoundScript : MonoBehaviour {
             notesList[i].GetComponent<RectTransform>().position += new Vector3(0, +ButtonListInterval);
             notesList[i].GetComponent<NoteList>().index = i;
         }
+
+        RedoStackInit();
     }
 
     public void ToggleRemoveMode()
@@ -445,5 +478,179 @@ public class SoundScript : MonoBehaviour {
     public void PlayIndexInit()
     {
         buttonIndex = 0;
+    }
+
+    void UndoStackInit()
+    {
+        undoDataList.Clear();
+        undoDatas.Clear();
+    }
+
+    void UndoAddNoteList(int index)
+    {
+        GameObject listNote = Instantiate(ListNote, GameObject.Find("Content").GetComponent<Transform>(), false);
+        for (int i = index; i < notesList.Count; i++)
+        {
+            notesList[i].GetComponent<RectTransform>().position += new Vector3(0, -ButtonListInterval);
+            notesList[i].GetComponent<NoteList>().index = i + 1;
+        }
+        notesList.Insert(index, listNote);
+
+        notesList[index].GetComponent<RectTransform>().position += (new Vector3(0, -ButtonListInterval * index));
+        notesList[index].GetComponentInChildren<Text>().text = Math.Round(noteDatas[index].time, demicalPoint) + " / " + noteDatas[index].name;
+        notesList[index].GetComponent<NoteList>().index = index;
+        notesList[index].GetComponent<NoteList>().isCreate = true;
+        
+    }
+
+    public void UndoRemoveNoteList(int index)
+    {
+        notesList[index].GetComponent<NoteList>().isCreate = false;
+
+        notesList.RemoveAt(index);
+        noteDatas.RemoveAt(index);
+        for (int i = index; i < notesList.Count; i++)
+        {
+            notesList[i].GetComponent<RectTransform>().position += new Vector3(0, +ButtonListInterval);
+            notesList[i].GetComponent<NoteList>().index = i;
+        }
+    }
+
+    void UndoAddNoteData(string _name, float _time)
+    {
+        NoteData notedata = new NoteData
+        {
+            name = _name,
+            time = _time
+        };
+
+        double beatTime = ((notedata.time) / (minTime));
+        beatTime = Math.Round(beatTime, 0);
+        beatTime *= minTime;
+        beatTime = Math.Round(beatTime, demicalPoint);
+        notedata.time = (float)beatTime;
+
+        int num = 0;
+        for (int i = 0; i < noteDatas.Count; i++)
+        {
+            if (noteDatas[i].time == notedata.time)
+            {
+                if (noteDatas[i].name != "Base" && notedata.name != "Base")
+                {
+                    num++;
+                }
+                if (noteDatas[i].name == notedata.name)
+                {
+                    return;
+                }
+            }
+
+            if (num > 1 && notedata.name != "Base")
+            {
+                return;
+            }
+        }
+
+        if (noteDatas.Count > 0)
+        {
+            bool largest = true;
+            for (int i = 0; i < noteDatas.Count; i++)
+            {
+                if (notedata.time <= noteDatas[i].time)
+                {
+                    noteDatas.Insert(i, notedata);
+                    largest = false;
+                    UndoAddNoteList(i);
+                    break;
+                }
+            }
+
+            if (largest)
+            {
+                noteDatas.Add(notedata);
+                UndoAddNoteList(noteDatas.Count - 1);
+            }
+        }
+        else
+        {
+            noteDatas.Add(notedata);
+            UndoAddNoteList(0);
+        }
+    }
+
+    void Undo()
+    {
+        NoteData notedata = new NoteData();
+        NoteDataList notelist = new NoteDataList();
+
+        if (undoDataList.Count > 0)
+        {
+            notelist = undoDataList.Pop();
+            redoDataList.Push(notelist);
+        }
+        else
+        {
+            return;
+        }
+
+        if (undoDatas.Count > 0)
+        {
+            notedata = undoDatas.Pop();
+            redoDatas.Push(notedata);
+        }
+        else
+        {
+            return;
+        }
+
+        if(notelist.isCreate)
+        {
+            GameObject.Find("Content").transform.GetChild(notelist.index).GetComponent<NoteList>().UndoRemoveNote();
+        }
+        else
+        {
+            UndoAddNoteData(notedata.name, notedata.time);
+        }
+    }
+
+    void Redo()
+    {
+        NoteData notedata = new NoteData();
+        NoteDataList notelist = new NoteDataList();
+
+        if (redoDataList.Count > 0)
+        {
+            notelist = redoDataList.Pop();
+            undoDataList.Push(notelist);
+        }
+        else
+        {
+            return;
+        }
+
+        if (redoDatas.Count > 0)
+        {
+            notedata = redoDatas.Pop();
+            undoDatas.Push(notedata);
+        }
+        else
+        {
+            return;
+        }
+
+        if (!notelist.isCreate)
+        {
+            GameObject.Find("Content").transform.GetChild(notelist.index).GetComponent<NoteList>().UndoRemoveNote();
+        }
+        else
+        {
+            UndoAddNoteData(notedata.name, notedata.time);
+        }
+    }
+
+    void RedoStackInit()
+    {
+        //redoDataList.Clear();
+        //redoDatas.Clear();
     }
 }
