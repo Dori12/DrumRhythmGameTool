@@ -35,6 +35,7 @@ public class SoundScript : MonoBehaviour {
     private InputField audioPitch;
     private InputField audioTimeInputField;
     private InputField ifFileName;
+    private InputField ifJumpInterval;
 
     private float pitch;
     private bool valueChange;
@@ -65,6 +66,7 @@ public class SoundScript : MonoBehaviour {
         undoDatas = new Stack<NoteData>();
         undoDataList = new Stack<GameObject>();
         ifFileName = GameObject.Find("FileNameInput").GetComponent<InputField>();
+        ifJumpInterval = GameObject.Find("JumpIntervalInputField").GetComponent<InputField>();
 
         bcSc[0] = GameObject.Find("HighHat").GetComponent<ButtonChange>();
         bcSc[1] = GameObject.Find("Snare").GetComponent<ButtonChange>();
@@ -143,6 +145,32 @@ public class SoundScript : MonoBehaviour {
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 ClickNote("Base");
+            }
+            if(Input.GetKeyDown(KeyCode.LeftArrow))
+            {
+                if (audioFile.time - (float)(Convert.ToDecimal(ifJumpInterval.text)) <= 0.0f)
+                {
+                    audioFile.time = 0.0f;
+                }
+                else
+                {
+                    audioFile.time -= (float)(Convert.ToDecimal(ifJumpInterval.text));
+                }
+                audioRemainTime.value = audioFile.time;
+                audioTimeInputField.text = audioFile.time.ToString();
+            }
+            if (Input.GetKeyDown(KeyCode.RightArrow))
+            {
+                if (audioFile.time + (float)(Convert.ToDecimal(ifJumpInterval.text)) >= audioFile.clip.length)
+                {
+                    audioFile.time = audioFile.clip.length-0.01f;
+                }
+                else
+                {
+                    audioFile.time += (float)(Convert.ToDecimal(ifJumpInterval.text));
+                }
+                audioRemainTime.value = audioFile.time;
+                audioTimeInputField.text = audioFile.time.ToString();
             }
         }
     }
