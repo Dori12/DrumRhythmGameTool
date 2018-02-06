@@ -74,6 +74,35 @@ public class SoundScript : MonoBehaviour {
         PitchControl();
         SliderControl();
         TimeInputFieldUpdate();
+        KeyUpdate();
+    }
+
+    void KeyUpdate()
+    {
+        if(Input.GetKeyDown(KeyCode.A))
+        {
+            ClickNote("HighHat");
+        }
+        if (Input.GetKeyDown(KeyCode.S))
+        {
+            ClickNote("Snare");
+        }
+        if (Input.GetKeyDown(KeyCode.D))
+        {
+            ClickNote("HighTom");
+        }
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            ClickNote("LowTom");
+        }
+        if (Input.GetKeyDown(KeyCode.G))
+        {
+            ClickNote("Symbol");
+        }
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            ClickNote("Base");
+        }
     }
 
     void CurrentTimePrint()
