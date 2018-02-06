@@ -24,6 +24,7 @@ public class NoteData : IComparable
 
 public class SoundScript : MonoBehaviour {
 
+    public float minTime;
     public GameObject ListNote;
 
     private AudioSource audioFile;
@@ -243,13 +244,20 @@ public class SoundScript : MonoBehaviour {
         AddNoteData(name, audioFile.time);
     }
 
-    void AddNoteData(string name, float time)
+    void AddNoteData(string _name, float _time)
     {
         NoteData notedata = new NoteData
         {
-            name = name,
-            time = time
+            name = _name,
+            time = _time
         };
+
+        double beatTime = ((notedata.time) / (minTime));
+        beatTime = Math.Round(beatTime, 0);
+        beatTime *= minTime;
+        beatTime = Math.Round(beatTime, 1);
+
+        notedata.time = (float)beatTime;
 
         if (noteDatas.Count > 0)
         {
