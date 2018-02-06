@@ -32,9 +32,11 @@ public class SoundScript : MonoBehaviour {
     private Slider audioRemainTime;
     private InputField audioPitch;
     private InputField audioTimeInputField;
+    private InputField ifFileName;
 
     private float pitch;
     private bool valueChange;
+    private string fileName;
 
     //private PriorityQueue<NoteData> noteDatas;
     private List<NoteData> noteDatas;
@@ -57,6 +59,7 @@ public class SoundScript : MonoBehaviour {
         isRemove = false;
         undoDatas = new Stack<NoteData>();
         undoDataList = new Stack<GameObject>();
+        ifFileName = GameObject.Find("FileNameInput").GetComponent<InputField>();
 
         audioName.text = audioFile.clip.name;
         currentTime.text = audioFile.time.ToString();
@@ -225,13 +228,13 @@ public class SoundScript : MonoBehaviour {
         string toJson = JsonHelper.ToJson<NoteData>(noteDatas.ToArray(), prettyPrint: true);
         DirectoryInfo dir = Directory.CreateDirectory(Application.dataPath + "/JsonFile");
         //Directory.CreateDirectory(Application.persistentDataPath + "/JsonFile");
-        File.WriteAllText(Application.dataPath + "/JsonFile/data.json", toJson);
-        //File.WriteAllText(Application.persistentDataPath + "JsonFile/data.json", toJson);
+        File.WriteAllText(Application.dataPath + "/JsonFile/" + fileName + ".json", toJson);
+        //File.WriteAllText(Application.persistentDataPath + "JsonFile/" + fileName" +".json", toJson);
     }
 
     public void Load()
     {
-        string jsonString = File.ReadAllText(Application.dataPath+ "/JsonFile/data.json");
+        string jsonString = File.ReadAllText(Application.dataPath+ "/JsonFile/" + fileName + ".json");
         NoteData[] data = JsonHelper.FromJson<NoteData>(jsonString);
         noteDatas.Clear();
         notesList.Clear();
@@ -272,6 +275,7 @@ public class SoundScript : MonoBehaviour {
         undoDatas.Push(noteDatas[index]);//
         undoDataList.Push(notesList[index]);//
         notesList.RemoveAt(index);
+        noteDatas.RemoveAt(index);
         for(int i=index; i < notesList.Count; i++)
         {
             notesList[i].transform.Translate(new Vector3(0, +32));
@@ -301,5 +305,10 @@ public class SoundScript : MonoBehaviour {
     public List<NoteData> GetNoteData()
     {
         return noteDatas;
+    }
+
+    public void ChangeFileName()
+    {
+        fileName = ifFileName.text;
     }
 }
