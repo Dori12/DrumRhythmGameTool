@@ -68,10 +68,10 @@ public class SoundScript : MonoBehaviour {
 
         bcSc[0] = GameObject.Find("HighHat").GetComponent<ButtonChange>();
         bcSc[1] = GameObject.Find("Snare").GetComponent<ButtonChange>();
-        bcSc[2] = GameObject.Find("Base").GetComponent<ButtonChange>();
+        bcSc[2] = GameObject.Find("Cymbal").GetComponent<ButtonChange>();
         bcSc[3] = GameObject.Find("HighTom").GetComponent<ButtonChange>();
         bcSc[4] = GameObject.Find("LowTom").GetComponent<ButtonChange>();
-        bcSc[5] = GameObject.Find("Cymbal").GetComponent<ButtonChange>();
+        bcSc[5] = GameObject.Find("Base").GetComponent<ButtonChange>();
 
         audioName.text = audioFile.clip.name;
         currentTime.text = audioFile.time.ToString();
@@ -263,14 +263,17 @@ public class SoundScript : MonoBehaviour {
         {
             if(noteDatas[i].time == notedata.time)
             {
-                num++;
+                if (noteDatas[i].name != "Base" && notedata.name != "Base")
+                {
+                    num++;
+                }
                 if (noteDatas[i].name == notedata.name)
                 {
                     return;
                 }
             }
 
-            if(num>2)
+            if(num>1 && notedata.name != "Base")
             {
                 return;
             }

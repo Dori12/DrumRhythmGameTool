@@ -1347,7 +1347,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42c47e28a94d23b48b982fd2ff397f13, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minTime: 0.1
+  minTime: 0.5
   demicalPoint: 2
   ListNote: {fileID: 1170843576531924, guid: 724ed256d140d9a4295bbc7f998e94b4, type: 2}
   isRemove: 0
