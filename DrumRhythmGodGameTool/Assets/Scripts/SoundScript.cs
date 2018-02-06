@@ -50,6 +50,8 @@ public class SoundScript : MonoBehaviour {
     private ButtonChange[] bcSc = new ButtonChange[6];
     public bool isRemove;
     private int buttonIndex;
+    public float ButtonListInterval;
+
 
     // Use this for initialization
     void Start () {
@@ -92,6 +94,7 @@ public class SoundScript : MonoBehaviour {
         TimeInputFieldUpdate();
         KeyUpdate();
         PlayNoteDataIndex();
+        
     }
 
     void PlayNoteDataIndex()
@@ -114,6 +117,10 @@ public class SoundScript : MonoBehaviour {
                     }
                 }
                 buttonIndex++;
+                if (notesList.Count > 1)
+                {
+                    notesList[buttonIndex - 1].GetComponent<Image>().color = new Color(255, 0, 0, 255);
+                }
             }
         }
     }
@@ -227,7 +234,6 @@ public class SoundScript : MonoBehaviour {
         else
         {
             audioRemainTime.value = audioFile.time;
-            
         }
     }
 
@@ -249,6 +255,19 @@ public class SoundScript : MonoBehaviour {
                     break;
                 }
             }
+
+            for (int i = 0; i < notesList.Count - 1; i++)
+            {
+                if (buttonIndex > i)
+                {
+                    notesList[i].GetComponent<Image>().color = new Color(255, 0, 0, 255);
+                }
+                else
+                {
+                    notesList[i].GetComponent<Image>().color = new Color(255, 255, 255, 255);
+                }
+            }
+
             audioFile.Play();
         }
     }
@@ -258,7 +277,6 @@ public class SoundScript : MonoBehaviour {
         if (audioFile.isPlaying)
         {
             audioFile.Pause();
-            PlayIndexInit();
         }
     }
 
@@ -369,11 +387,11 @@ public class SoundScript : MonoBehaviour {
         GameObject listNote = Instantiate(ListNote, GameObject.Find("Content").GetComponent<Transform>(), false);
         for (int i=index; i< notesList.Count; i++)
         {
-            notesList[i].GetComponent<RectTransform>().position += new Vector3(0, -40);
+            notesList[i].GetComponent<RectTransform>().position += new Vector3(0, -ButtonListInterval);
             notesList[i].GetComponent<NoteList>().index = i+1;
         }
         notesList.Insert(index, listNote);
-        notesList[index].GetComponent<RectTransform>().position += (new Vector3(0, -40 * index));
+        notesList[index].GetComponent<RectTransform>().position += (new Vector3(0, -ButtonListInterval * index));
         notesList[index].GetComponentInChildren<Text>().text = Math.Round(noteDatas[index].time, 2) + " / " + noteDatas[index].name;
         notesList[index].GetComponent<NoteList>().index = index;
         notesList[index].GetComponent<NoteList>().isCreate = true;
@@ -390,7 +408,7 @@ public class SoundScript : MonoBehaviour {
         noteDatas.RemoveAt(index);
         for(int i=index; i < notesList.Count; i++)
         {
-            notesList[i].GetComponent<RectTransform>().position += new Vector3(0, +40);
+            notesList[i].GetComponent<RectTransform>().position += new Vector3(0, +ButtonListInterval);
             notesList[i].GetComponent<NoteList>().index = i;
         }
     }

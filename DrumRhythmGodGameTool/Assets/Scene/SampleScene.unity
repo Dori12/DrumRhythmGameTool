@@ -415,8 +415,13 @@ RectTransform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 56755084}
+<<<<<<< HEAD
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.000030517578, y: 299.99994, z: 0}
+=======
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+>>>>>>> b5aa99359b352ec3cde92ea6fd6ffe530221252e
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 921276292}
@@ -1346,10 +1351,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42c47e28a94d23b48b982fd2ff397f13, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+<<<<<<< HEAD
   minTime: 0.1
+=======
+  minTime: 0.01
+>>>>>>> b5aa99359b352ec3cde92ea6fd6ffe530221252e
   demicalPoint: 2
   ListNote: {fileID: 1170843576531924, guid: 724ed256d140d9a4295bbc7f998e94b4, type: 2}
   isRemove: 0
+  ButtonListInterval: 60
 --- !u!114 &465449595
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4555,7 +4565,11 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
+<<<<<<< HEAD
   m_audioClip: {fileID: 8300000, guid: 56f2083615fb4e74ba54df51f38d83db, type: 3}
+=======
+  m_audioClip: {fileID: 8300000, guid: e872ffcf050ac3a4b820719576d1cce4, type: 3}
+>>>>>>> b5aa99359b352ec3cde92ea6fd6ffe530221252e
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
@@ -4762,10 +4776,10 @@ RectTransform:
   m_Father: {fileID: 465449598}
   m_RootOrder: 11
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 1, y: 0.5}
-  m_AnchorMax: {x: 1, y: 0.5}
+  m_AnchorMin: {x: 1, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: -10}
-  m_SizeDelta: {x: 200, y: 550}
+  m_SizeDelta: {x: 200, y: -50}
   m_Pivot: {x: 1, y: 0.5}
 --- !u!114 &1502605689
 MonoBehaviour:
@@ -5016,7 +5030,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: -123.917725, y: -17.299988}
+  m_AnchoredPosition: {x: -123.917725, y: -17.300049}
   m_SizeDelta: {x: 60, y: 30}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &1653384376
@@ -5190,7 +5204,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1349302867}
   m_HandleRect: {fileID: 1349302866}
   m_Direction: 0
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
