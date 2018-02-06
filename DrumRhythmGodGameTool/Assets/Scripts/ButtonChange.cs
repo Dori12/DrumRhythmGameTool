@@ -28,14 +28,12 @@ public class ButtonChange : MonoBehaviour {
 
     void ChangeColor()
     {
-        Debug.Log("Color Change");
         gameObject.GetComponent<Image>().color = new Color(255, 0, 0, 255);
         Invoke("ResetColor", 0.1f);
     }
 
     void ResetColor()
     {
-        Debug.Log("Color Reset");
         gameObject.GetComponent<Image>().color = new Color(255, 255, 255, 255);
     }
 }
