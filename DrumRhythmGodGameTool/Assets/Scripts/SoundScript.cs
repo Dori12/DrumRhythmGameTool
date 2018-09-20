@@ -387,9 +387,7 @@ public class SoundScript : MonoBehaviour {
     {
         string toJson = JsonHelper.ToJson<NoteData>(noteDatas.ToArray(), prettyPrint: true);
         Directory.CreateDirectory(Application.dataPath + "/JsonFile");
-        //Directory.CreateDirectory(Application.persistentDataPath + "/JsonFile");
         File.WriteAllText(Application.dataPath + "/JsonFile/" + fileName + ".json", toJson);
-        //File.WriteAllText(Application.persistentDataPath + "JsonFile/" + fileName" +".json", toJson);
     }
 
     public void Load()
